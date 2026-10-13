@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <title>Werkbank</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">W</div>
+        <div><strong>Werkbank</strong><span>jouw werkcockpit</span></div>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-view="dashboard">Overzicht</button>
+        <button class="nav-btn" data-view="tasks">Taken</button>
+        <button class="nav-btn" data-view="ict">ICT-meldingen</button>
+        <button class="nav-btn" data-view="links">Snelkoppelingen</button>
+        <button class="nav-btn" data-view="settings">Instellingen</button>
+      </nav>
+      <div class="sidebar-footer">V0.1 · lokaal opgeslagen</div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="todayLabel"></p>
+          <h1 id="greeting">Goedemorgen</h1>
+          <p class="muted">Wat moet er vandaag gebeuren?</p>
+        </div>
+        <button id="installBtn" class="btn secondary hidden">Installeer app</button>
+      </header>
+
+      <section id="dashboard" class="view active">
+        <div class="grid two">
+          <section class="card dump-card">
+            <div class="section-heading"><div><p class="eyebrow">Snel erin</p><h2>Dump</h2></div><span class="pill">één regel = één taak</span></div>
+            <textarea id="dumpInput" placeholder="Melissa kan niet printen. Donderdag kijken.\nBlok 2 contextsommen maken.\nFG moet aanwezigheidsapp nog herkeuren."></textarea>
+            <div class="row end"><button id="dumpBtn" class="btn primary">Verwerk dump</button></div>
+          </section>
+
+          <section class="card focus-card">
+            <div class="section-heading"><div><p class="eyebrow">Vandaag</p><h2>Focus</h2></div><span id="openCount" class="pill"></span></div>
+            <div id="focusList" class="stack compact"></div>
+          </section>
+        </div>
+
+        <div class="grid three stats">
+          <article class="stat card"><span>Open taken</span><strong id="statTasks">0</strong></article>
+          <article class="stat card"><span>ICT open</span><strong id="statIct">0</strong></article>
+          <article class="stat card"><span>Vandaag klaar</span><strong id="statDone">0</strong></article>
+        </div>
+
+        <section class="card">
+          <div class="section-heading"><div><p class="eyebrow">Direct naar</p><h2>Snelkoppelingen</h2></div><button class="link-btn" data-go="links">Beheren</button></div>
+          <div id="quickLinks" class="quick-links"></div>
+        </section>
+      </section>
+
+      <section id="tasks" class="view">
+        <div class="page-heading"><div><p class="eyebrow">Werkvoorraad</p><h2>Taken</h2></div><button id="newTaskBtn" class="btn primary">+ Nieuwe taak</button></div>
+        <div class="toolbar">
+          <select id="taskFilter"><option value="open">Open</option><option value="all">Alles</option><option value="done">Afgerond</option></select>
+          <select id="categoryFilter"><option value="all">Alle categorieën</option><option>ICT</option><option>Onderwijs</option><option>Project</option><option>Administratie</option><option>Overig</option></select>
+        </div>
+        <div id="taskList" class="stack"></div>
+      </section>
+
+      <section id="ict" class="view">
+        <div class="page-heading"><div><p class="eyebrow">Problemen & verzoeken</p><h2>ICT-meldingen</h2></div><button id="newIctBtn" class="btn primary">+ Nieuwe melding</button></div>
+        <div id="ictList" class="stack"></div>
+      </section>
+
+      <section id="links" class="view">
+        <div class="page-heading"><div><p class="eyebrow">Alles op één plek</p><h2>Snelkoppelingen</h2></div><button id="newLinkBtn" class="btn primary">+ Nieuwe koppeling</button></div>
+        <div id="linksList" class="quick-links manage"></div>
+      </section>
+
+      <section id="settings" class="view">
+        <div class="page-heading"><div><p class="eyebrow">Beheer</p><h2>Instellingen</h2></div></div>
+        <div class="grid two">
+          <section class="card"><h3>Backup</h3><p class="muted">Exporteer alle lokale Werkbank-data naar één JSON-bestand.</p><button id="exportBtn" class="btn primary">Exporteer data</button></section>
+          <section class="card"><h3>Herstellen</h3><p class="muted">Importeer eerder geëxporteerde Werkbank-data.</p><label class="btn secondary file-btn">Importeer data<input id="importInput" type="file" accept="application/json" hidden></label></section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="itemDialog">
+    <form method="dialog" id="itemForm">
+      <div class="dialog-head"><h3 id="dialogTitle">Nieuwe taak</h3><button value="cancel" class="icon-btn" aria-label="Sluiten">×</button></div>
+      <input type="hidden" id="formType">
+      <input type="hidden" id="formId">
+      <label>Titel<input id="formTitle" required maxlength="120"></label>
+      <label id="personWrap" class="hidden">Voor wie / locatie<input id="formPerson" maxlength="80"></label>
+      <div class="grid two form-grid">
+        <label id="categoryWrap">Categorie<select id="formCategory"><option>ICT</option><option>Onderwijs</option><option>Project</option><option>Administratie</option><option>Overig</option></select></label>
+        <label>Prioriteit<select id="formPriority"><option value="normal">Normaal</option><option value="high">Hoog</option><option value="low">Laag</option></select></label>
+      </div>
+      <label id="dateWrap">Deadline<input id="formDate" type="date"></label>
+      <label>Notitie<textarea id="formNotes" rows="4"></textarea></label>
+      <div class="dialog-actions"><button value="cancel" class="btn secondary">Annuleren</button><button id="saveItemBtn" value="default" class="btn primary">Opslaan</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="linkDialog">
+    <form method="dialog" id="linkForm">
+      <div class="dialog-head"><h3>Snelkoppeling</h3><button value="cancel" class="icon-btn">×</button></div>
+      <input type="hidden" id="linkId">
+      <label>Naam<input id="linkName" required maxlength="50"></label>
+      <label>URL<input id="linkUrl" type="url" required placeholder="https://..."></label>
+      <label>Icoon / emoji<input id="linkIcon" maxlength="4" placeholder="🔗"></label>
+      <div class="dialog-actions"><button value="cancel" class="btn secondary">Annuleren</button><button value="default" class="btn primary">Opslaan</button></div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
