@@ -7,7 +7,7 @@ let state=load();
 function defaults(){return{tasks:[],ict:[],links:[{id:crypto.randomUUID(),name:'SharePoint',url:'https://www.office.com/',icon:'📁'},{id:crypto.randomUUID(),name:'GitHub',url:'https://github.com/yoeran-work',icon:'💻'},{id:crypto.randomUUID(),name:'Firebase',url:'https://console.firebase.google.com/',icon:'🔥'},{id:crypto.randomUUID(),name:'ParnasSys',url:'https://www.parnassys.nl/',icon:'🏫'}],doneToday:0}}
 function load(){try{return Object.assign(defaults(),JSON.parse(localStorage.getItem(STORE)||'{}'))}catch{return defaults()}}
 function save(){localStorage.setItem(STORE,JSON.stringify(state));renderPage()}
-function esc(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function esc(s=''){return String(s).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]))}
 function nlDate(d){if(!d)return'';return new Date(d+'T12:00:00').toLocaleDateString('nl-NL',{day:'numeric',month:'short'})}
 function setHeader(){const label=$('#todayLabel'),greeting=$('#greeting');if(!label&&!greeting)return;const d=new Date();if(label)label.textContent=d.toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});if(greeting){const h=d.getHours();greeting.textContent=h<12?'Goedemorgen':h<18?'Goedemiddag':'Goedenavond'}}
 
@@ -24,6 +24,9 @@ function renderLinks(){const list=$('#linksList');if(!list)return;list.innerHTML
 function renderPage(){renderDashboard();renderTasks();renderIct();renderLinks()}
 
 function openItem(type,id=''){const dialog=$('#itemDialog');if(!dialog)return;const obj=id?(type==='task'?state.tasks:state.ict).find(x=>x.id===id):null;$('#formType').value=type;$('#formId').value=id;$('#dialogTitle').textContent=id?(type==='task'?'Taak bewerken':'Melding bewerken'):(type==='task'?'Nieuwe taak':'Nieuwe ICT-melding');$('#formTitle').value=obj?.title||'';if($('#formPerson'))$('#formPerson').value=obj?.person||'';if($('#formCategory'))$('#formCategory').value=obj?.category||'ICT';$('#formPriority').value=obj?.priority||'normal';if($('#formDate'))$('#formDate').value=obj?.date||'';$('#formNotes').value=obj?.notes||'';dialog.showModal()}
+
+// Annuleren en × moeten een dialog altijd direct sluiten en mogen nooit het formulier submitten.
+$$('button[value="cancel"]').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();btn.closest('dialog')?.close()}));
 
 $('#newTaskBtn')?.addEventListener('click',()=>openItem('task'));
 $('#newIctBtn')?.addEventListener('click',()=>openItem('ict'));
